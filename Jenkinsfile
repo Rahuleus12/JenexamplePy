@@ -27,12 +27,6 @@ pipeline {
                 to:"rajeshunique.31@gmail.com",
                 body:"${env.BUILD_URL}"
             )
-                // Send email notification
-            emailext (
-                subject: 'Jenkins Build Successful: All Tests Passed',
-                body: 'The Jenkins pipeline ran successfully, and all tests passed!',
-                to: 'rajeshunique.31@gmail.com'
-            )
         }
     }
 }
