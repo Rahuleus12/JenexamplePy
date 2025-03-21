@@ -5,7 +5,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Checkout your code from version control
-                git 'https://your-repo-url/jenkins-python-test.git'
+                git 'https://github.com/Rahuleus12/JenexamplePy.git'
             }
         }
 
