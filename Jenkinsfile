@@ -4,30 +4,32 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // Checkout your code from version control
-                git 'https://github.com/Rahuleus12/JenexamplePy.git'
+                script {
+                    checkout scm
+                }
             }
         }
 
-        stage('Setup Python') {
+        stage('Install Dependencies') {
             steps {
-                // Set up Python environment
-                sh 'python -m pip install pytest'
+                script {
+                    sh 'pip install pytest'
+                }
             }
         }
 
         stage('Run Tests') {
             steps {
-                // Run Python tests
-                sh 'python -m pytest test_calculator.py -v'
+                script {
+                    sh 'pytest test_calculate.py --tb=short'
+                }
             }
         }
     }
 
     post {
-        always {
-            // Clean up workspace
-            cleanWs()
+        success {
+            echo 'All tests passed successfully! 🎉'
         }
     }
 }
