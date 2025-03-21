@@ -10,14 +10,6 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
-            steps {
-                script {
-                    sh 'pacman -Sy python-pytest'
-                }
-            }
-        }
-
         stage('Run Tests') {
             steps {
                 script {
