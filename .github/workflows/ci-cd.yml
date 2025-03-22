@@ -12,9 +12,9 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v2
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v2
       with:
         python-version: '3.10'
     - name: Install dependencies
@@ -29,9 +29,9 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v2
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v2
       with:
         python-version: '3.10'
     - name: Install dependencies
@@ -44,12 +44,10 @@ jobs:
         # Add build steps here if needed (e.g., creating distribution packages)
         # For a Flask app, this might be minimal
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v1
       with:
         name: app-build
-        path: |
-          *.py
-          requirements.txt
+        path: .
           
   deploy-staging:
     needs: build
@@ -59,9 +57,9 @@ jobs:
       name: staging
       url: ${{ steps.deploy.outputs.deployment-url }}
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v2
     - name: Download build artifacts
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v1
       with:
         name: app-build
     - name: Deploy to staging
@@ -82,9 +80,9 @@ jobs:
       name: production
       url: ${{ steps.deploy.outputs.deployment-url }}
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v2
     - name: Download build artifacts
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v1
       with:
         name: app-build
     - name: Deploy to production
