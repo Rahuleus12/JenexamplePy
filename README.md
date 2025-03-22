@@ -1,78 +1,104 @@
-Since the assignment required a VM I have installed an Arch based system for ease of use and quick configuration. 
+# Flask Calculator API
 
-# In case of a proper install:
-## 1.Install jdk17
+A simple Flask application that provides basic calculator operations via REST API endpoints.
+
+## Features
+
+- Addition, subtraction, multiplication, and division operations
+- Error handling for invalid inputs and division by zero
+- RESTful API with JSON responses
+- CI/CD pipeline using GitHub Actions
+
+## Getting Started
+
+### Prerequisites
+
+- Python 3.8 or higher
+- pip package manager
+
+### Installation
+
+1. Clone the repository:
 ```bash
-sudo apt install openjdk-17-jdk #since most of our practice has been on ubuntu i have opted for its default manager here
-```
-## 2. Download Jenkins.war file from jenkins and install it using java:
-```bash 
-java -jar jenkins.war
+git clone https://github.com/yourusername/JenexamplePy.git
+cd JenexamplePy
 ```
 
-# Installing and Running Jenkins on Arch Linux
-
-## 1. Install Java
-Jenkins requires Java to run. Install the LTS version:
+2. Install the dependencies:
 ```bash
-sudo pacman -Sy jdk17-openjdk
+pip install -r requirements.txt
 ```
 
-## 2. Install Jenkins
-Install Jenkins from the AUR using an AUR helper like `yay`:
+3. Run the application:
 ```bash
-paru -Sy jenkins
+python calculate.py
 ```
 
-## 3. Start Jenkins Service
-Enable and start the Jenkins service:
+## API Endpoints
+
+- `/add?a=number&b=number` - Adds two numbers
+- `/subtract?a=number&b=number` - Subtracts b from a
+- `/multiply?a=number&b=number` - Multiplies two numbers
+- `/divide?a=number&b=number` - Divides a by b
+
+## CI/CD Pipeline with GitHub Actions
+
+This repository uses GitHub Actions to implement a Continuous Integration and Continuous Deployment pipeline.
+
+### Workflow Overview
+
+The workflow automates the following steps:
+
+1. **Test**: Runs on every push and pull request to main and staging branches
+   - Sets up Python environment
+   - Installs dependencies
+   - Runs pytest test suite
+
+2. **Build**: Runs after successful tests
+   - Prepares the application for deployment
+   - Creates build artifacts
+
+3. **Deploy to Staging**: Runs when changes are pushed to the staging branch
+   - Deploys the application to a staging environment
+   - Uses staging-specific configuration
+
+4. **Deploy to Production**: Runs when a release is published
+   - Deploys the application to the production environment
+   - Uses production-specific configuration
+
+### Setting Up GitHub Secrets
+
+The workflow uses GitHub Secrets to store sensitive information. To set up the required secrets:
+
+1. Navigate to your GitHub repository
+2. Go to **Settings** > **Secrets and variables** > **Actions**
+3. Add the following secrets:
+
+| Secret Name | Description |
+|-------------|-------------|
+| `DEPLOY_KEY` | SSH key or API token used for deployment |
+| `STAGING_SERVER` | Hostname or IP address of the staging server |
+| `PRODUCTION_SERVER` | Hostname or IP address of the production server |
+
+### Branch Strategy
+
+- `main`: Main development branch, changes here are tested but not automatically deployed
+- `staging`: Staging branch, changes here trigger deployment to the staging environment
+- `tags/releases`: Creating a new release deploys to the production environment
+
+## Running Tests
+
+Run the test suite with:
+
 ```bash
-sudo systemctl enable jenkins
-sudo systemctl start jenkins
+pytest
 ```
 
-## 4. Initial Setup
-1. Get the initial admin password:
-```bash
-sudo cat /var/lib/jenkins/secrets/initialAdminPassword
-```
+## Contributing
 
-2. Open your web browser and navigate to:
-```
-http://localhost:8080
-```
-3. Enter the initial admin password
-4. Install suggested plugins
-5. Create your admin user account
-6. Configure Jenkins URL if required I chose not to change
-
-## 5. Installing Python Tools
-Install necessary Python packages:
-```bash
-sudo pacman -S python python-pytest
-```
-
-## 6. Configure Jenkins for Python
-
-1. Go to "Manage Jenkins" → "Manage Plugins"
-2. Install "Python" plugin
-
-3. Go to "Manage Jenkins" → "Global Tool Configuration"
-4. Add Python installation
-
-## 7. Create a demo repository
-I have used an old pytest code to test this out it is available at https://github.com/Rahuleus12/JenexamplePy    
-
-## 8. Create Jenkins Pipeline
-Configure the pipeline by creating a pipeline in jenkins accordingly:
-1.Add the github project and add the repo address
-2.Select Github hook trigger for GITScm polling
-3.Configure Pipeline
-3.1.Give it a definition and define the scm as preffered in this case git
-3.2. Enter the Repository link and add credentials in case of private repository
-3.3.Specify the branch of as main as required then specify the Jenkinsfile.
-
-## 9. Run the Pipeline
-
- Click "Build Now" in your pipeline project or commit to the git repo for it to build, succeed and send an email notification.
-
+1. Create a new branch from `main`
+2. Make your changes
+3. Run tests locally to ensure they pass
+4. Create a pull request to the `staging` branch
+5. After review and approval, your changes will be merged and deployed to staging
+6. Once verified in staging, changes can be included in a release for production deployment 
