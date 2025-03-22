@@ -44,7 +44,7 @@ jobs:
         # Add build steps here if needed (e.g., creating distribution packages)
         # For a Flask app, this might be minimal
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v2
       with:
         name: app-build
         path: |
@@ -61,7 +61,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Download build artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v2
       with:
         name: app-build
     - name: Deploy to staging
@@ -84,7 +84,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Download build artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v2
       with:
         name: app-build
     - name: Deploy to production
