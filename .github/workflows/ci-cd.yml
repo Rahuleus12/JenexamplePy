@@ -9,6 +9,7 @@ on:
     types: [ published ]
 
 jobs:
+  # Step 1: Install Dependencies and Run Tests
   test:
     runs-on: ubuntu-latest
     steps:
@@ -25,15 +26,10 @@ jobs:
       run: |
         pytest
 
-  # Combined build and deploy steps to simplify the workflow
-  deploy:
+  # Step 2: Build - Prepare the application for deployment
+  build:
     needs: test
     runs-on: ubuntu-latest
-    # Create different environments based on branch/release
-    environment:
-      name: ${{ github.ref == 'refs/heads/staging' && 'staging' || (github.event_name == 'release' && github.event.action == 'published' && 'production' || 'development') }}
-    # Only run deploy on staging branch or release published
-    if: github.ref == 'refs/heads/staging' || (github.event_name == 'release' && github.event.action == 'published')
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python
@@ -44,14 +40,76 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-    - name: Deploy application
+    - name: Build application
+      run: |
+        echo "Building application for deployment..."
+        # For a Flask app, we might need to:
+        # 1. Create any necessary configuration files
+        # 2. Compile static assets if needed
+        # 3. Perform any pre-deployment tasks
+        # Since this is a simple app, we're just simulating the build step
+        mkdir -p build
+        cp -r *.py requirements.txt build/
+    - name: Save build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: app-build
+        path: build/
+
+  # Step 3: Deploy to Staging (only when pushing to staging branch)
+  deploy-staging:
+    needs: build
+    if: github.ref == 'refs/heads/staging'
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+      url: ${{ steps.deploy.outputs.deployment-url }}
+    steps:
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: app-build
+        path: ./app
+    - name: Deploy to staging
       id: deploy
       env:
         DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
-        SERVER: ${{ github.ref == 'refs/heads/staging' && secrets.STAGING_SERVER || secrets.PRODUCTION_SERVER }}
-        ENVIRONMENT: ${{ github.ref == 'refs/heads/staging' && 'staging' || 'production' }}
+        STAGING_SERVER: ${{ secrets.STAGING_SERVER }}
+        STAGING_API_TOKEN: ${{ secrets.STAGING_API_TOKEN }}
       run: |
-        echo "Deploying to $ENVIRONMENT environment..."
-        # Add deployment steps here (e.g., SSH to server, update code)
-        # For now, we're just simulating the deployment
-        echo "deployment-url=https://$ENVIRONMENT.example.com" >> $GITHUB_OUTPUT 
+        echo "Deploying to staging environment..."
+        # In a real scenario, you would use the secrets to:
+        # 1. SSH into the staging server using DEPLOY_KEY
+        # 2. Copy files to the appropriate directory
+        # 3. Restart services as needed
+        # 4. Verify deployment
+        echo "deployment-url=https://staging.example.com" >> $GITHUB_OUTPUT
+
+  # Step 4: Deploy to Production (only when a release is published)
+  deploy-production:
+    needs: build
+    if: github.event_name == 'release' && github.event.action == 'published'
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.deployment-url }}
+    steps:
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: app-build
+        path: ./app
+    - name: Deploy to production
+      id: deploy
+      env:
+        DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+        PRODUCTION_SERVER: ${{ secrets.PRODUCTION_SERVER }}
+        PRODUCTION_API_TOKEN: ${{ secrets.PRODUCTION_API_TOKEN }}
+      run: |
+        echo "Deploying to production environment..."
+        # In a real scenario, you would use the secrets to:
+        # 1. SSH into the production server using DEPLOY_KEY
+        # 2. Copy files to the appropriate directory
+        # 3. Restart services as needed
+        # 4. Verify deployment
+        echo "deployment-url=https://example.com" >> $GITHUB_OUTPUT 
